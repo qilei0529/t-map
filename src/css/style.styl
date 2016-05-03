@@ -1,0 +1,84 @@
+body
+    padding: 10px
+    background: #f7f6f5
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif
+
+.ds_header
+    margin: 0 auto
+    width: 600px
+    h1
+        font-size: 18px
+
+.ds_body
+    width: 600px
+    margin: 0 auto
+    min-height: 400px
+    background: #fff
+    position: relative
+    // overflow: hidden
+    
+.ds_map_hold
+    width: 30px
+    height: 30px
+    position: absolute
+    top: 50%
+    left: 50%
+    // margin-top: -15px
+    // margin-left: -15px
+        
+.ds_map_focus 
+    .ds_box
+        width: 29px
+        height: 29px
+        background: #f09
+.ds_map
+    width: 30px
+    height: 30px
+    position: absolute
+    top:0
+    left:0
+.ds_root
+    -webkit-user-select: none
+.ds_grid
+    width: 30px
+    height: 30px
+    text-align: center
+    line-height: 30px
+    .ds_box
+        width: 29px
+        height: 29px
+        font-size: 10px
+        color: rgba(40,20,80,0.5)
+        background: rgba(40,20,250,0.1)
+        &:hover
+            background: rgba(40,20,250,0.3)
+    
+.ds_grid_line
+    width: 1000px
+    display: flex
+
+.ds_hover
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background: rgba(20,200,20,0.5)
+
+.ds_data
+    position: absolute
+    top: 0
+    left: 0
+    -webkit-user-select: none
+    .ds_case
+        width: 30px
+        height: 30px
+        text-align: center
+        line-height: 30px
+        position: absolute
+    .ds_box
+        width: 29px
+        height: 29px
+        font-size: 10px
+        color: rgba(40,20,80,0.8)
+        background: rgba(240,20,250,0.5)

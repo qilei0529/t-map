@@ -1,6 +1,23 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
-  p hello TMap  >...<
+  div(class='ds_header' )
+    h1= title
+  div(class='ds_body' id='main_app')
+    div(class='ds_map_hold')
+      div(class='ds_map_focus')
+        div(class='ds_box')
+      div(class='ds_map' v-bind:style='hold_style')
+        //- hover
+        div(class='ds_hover' v-bind:style='hover_style' @click='on_mouse_down( $event )')
+        //- root
+        div(class='ds_root')
+          div(class='ds_grid_line' v-for='y in size_grid.h')
+            div(class='ds_grid' v-for='x in size_grid.w')
+              div(class='ds_box') {{x}},{{y}}
+        //- data
+        div(class='ds_data')
+          div(class='ds_case' v-bind:style='m.style' v-for='m in case')
+            div(class='ds_box') {{m.data.x}},{{m.data.y}}
+  script(src='/js/vue.js')
+  script(src='/js/main.js')
