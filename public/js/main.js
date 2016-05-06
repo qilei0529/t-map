@@ -6,6 +6,7 @@ var Config = {
     }
 }
 
+
 // 主要对象
 var main_config = {
     el: '#main_app',
@@ -23,33 +24,31 @@ var main_config = {
             w : [],
             h : [],
         },
-
         case : {},
-
-        hold_style : {
-            left: '0px',
-            top: '0px'
+        case_d : {
+            name: '1',
+            data: {
+                x: 1,
+                y: 1,
+                w: 1,
+                h: 1
+            },
+            img : 'sprite-1'
         },
-        hover_style : {
-            width: '0px',
-            height: '0px'
-        },
-        pos_box : {
-            x: 0,
-            y: 0
-        }
     },
 
     watch : {
         pos : function( newV , oldV){
             this.update_hold_pos(newV)
         },
-        pos_box : function( newV , oldV){
-            // this.update_hold_pos(newV)
-            // console.log(newV)
+        size : {
+            handler : function( newV){
+                this.update_size( newV )
+            },
+            deep: true
         },
-        size : function( newV){
-            this.update_size( newV )
+        case_d : function( newV , oldV){
+            this.update_case( newV , oldV )
         }
     },
 
@@ -63,19 +62,43 @@ var main_config = {
             w : 20,
             h : 10
         }
+
+        this.init_key_bind()
     },
 
     methods : {
+        init_key_bind : function(){
+            var _this = this
+            window.document.onkeydown = function(e){
+                console.log(e.keyCode)
+                var key = e.keyCode
+                switch ( key ) {    
+                    case 87 : // W
+                        _this.pos.y += 1
+                        break
+                    case 83 : // S
+                        _this.pos.y -= 1
+                        break
+                    case 65 : // A
+                        _this.pos.x += 1
+                        break
+                    case 68 : // D
+                        _this.pos.x -= 1
+                        break
+                }
+            }
+            console.log('init key bind')
+        },
+
         update_hold_pos : function( p ){
             var s = this.hold_style
-            this.hold_style.left = -p.x * 30 + 'px'
-            this.hold_style.top  = -p.y * 30 + 'px'
         },
 
         update_size : function( size ){
             var s = this.size_grid
             s.w = []
             s.h = []
+
             for (var i = 0 ; i < size.w ; ++i) {
                 s.w.push(i)
             }
@@ -83,13 +106,7 @@ var main_config = {
             for (var i = 0 ; i < size.h ; ++i) {
                 s.h.push(i)
             }
-            this.hover_style.width = size.w * 30 + 'px'
-            this.hover_style.height  = size.h * 30 + 'px'
-        },
-
-        on_click_box : function( x, y){
-            console.log('click' , x, y)
-            this.add_box( x, y)
+            console.log('update size' , size.w)
         },
 
         on_mouse_down : function( e ){
@@ -99,47 +116,50 @@ var main_config = {
                 y : parseInt(e.layerY / 30)
             }
             
-            this.pos_box = {
-                x : p.x,
-                y : p.y
-            }
-
-            console.log('mouse down', p , this.pos_box )
-
             this.add_box( p.x , p.y)
-        },
-
-        on_mouse_move : function( e ){
-            var p = {
-                x : parseInt(e.layerX / 30),
-                y : parseInt(e.layerY / 30)
-            }
-
-            var op = {
-                x : this.pos_box.x,
-                y : this.pos_box.y
-            }
-
-            if (p.x != op.x || p.y != op.y) {
-                console.log( 'dif' , p , op)
-                this.pos_box = p
-            }
-
         },
 
         add_box : function( x, y ){
             var c = {
                 data : {
                     x : x,
-                    y : y
+                    y : y,
+                    w: 1,
+                    h: 1
                 },
                 style : {
                     left : x * 30 + 'px',
                     top  : y * 30 + 'px'
-                }
+                },
+                img : '',
+                focus : false,
+                show  : true
             }
-            this.$set('case.c_' + x + '_' + y , c)
-            console.log(this.case)
+
+            var n = 'c_' + x + '_' + y
+            c.name = n
+
+            this.$set('case.' + n , c)
+
+            this.case_d = this.$get('case.' + n)
+            
+            console.log('create: ',n)
+        },
+
+        update_case : function( c , o ){
+            o.focus = false
+            c.focus = true
+        },
+
+        on_click_case : function( m ){
+            console.log(m)
+
+            this.case_d = m
+        },
+        
+        on_click_del : function(){
+            this.case_d.show = false
+            this.case_d = {}
         },
 
         box_style : function( m ){
@@ -153,6 +173,4 @@ var main_config = {
 
 // 启动vue
 var vm_main = new Vue( main_config )
-
-
 

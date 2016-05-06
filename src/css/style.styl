@@ -1,7 +1,7 @@
 body
     padding: 10px
     background: #f7f6f5
-    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif
+    font: 14px Verdana "Lucida Grande", Helvetica, Arial, sans-serif
 
 .ds_header
     margin: 0 auto
@@ -30,13 +30,14 @@ body
     .ds_box
         width: 29px
         height: 29px
-        background: #f09
+        background: rgba(100,0,250, 0.3)
 .ds_map
     width: 30px
     height: 30px
     position: absolute
     top:0
     left:0
+    transition: top 0.2s , left 0.2s
 .ds_root
     -webkit-user-select: none
 .ds_grid
@@ -54,7 +55,7 @@ body
             background: rgba(40,20,250,0.3)
     
 .ds_grid_line
-    width: 1000px
+    // width: 1000px
     display: flex
 
 .ds_hover
@@ -63,7 +64,7 @@ body
     left: 0
     right: 0
     bottom: 0
-    background: rgba(20,200,20,0.5)
+    background: rgba(20,200,20,0.2)
 
 .ds_data
     position: absolute
@@ -76,9 +77,62 @@ body
         text-align: center
         line-height: 30px
         position: absolute
+        &.hover
+            .ds_box
+                background: rgba(240,100,100,1)
+                
     .ds_box
+        pointer-events: none
         width: 29px
         height: 29px
         font-size: 10px
         color: rgba(40,20,80,0.8)
-        background: rgba(240,20,250,0.5)
+        background: rgba(240,100,100,0.5)
+        
+.ds_side
+    position: absolute
+    width: 200px
+    right: -210px
+    min-height: 400px
+
+.ds_side_panel
+    background: #fff
+    margin-bottom: 10px
+    padding: 10px
+
+.ds_form_tit
+    font-size: 14px
+    padding:0 0 10px 0
+
+.ds_form_sec
+    line-height: 15px
+    height: 15px
+    background: #f7f6f5
+    font-size: 12px
+    padding: 4px
+    margin-bottom: 5px
+    color: #666
+    
+.ds_form_row
+    line-height: 30px
+    height: 30px
+    font-size: 12px
+    color: #666
+    margin-bottom: 5px
+    padding-left: 5px
+    label
+        display: inline-block
+        width: 20px
+        &[size='4']
+            width: 40px
+    .ds_input
+        line-height: 16px
+        font-size: 12px
+        border: 1px solid #eea
+        padding: 3px 3px
+        outline: none
+        background: #ffffdd
+        border-radius: 2px
+        &[size='4']
+            width: 30px
+            margin-right: 5px
