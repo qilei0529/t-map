@@ -1,5 +1,6 @@
 body
-    padding: 10px
+    margin: 0
+    padding: 0
     background: #f7f6f5
     font: 14px Verdana "Lucida Grande", Helvetica, Arial, sans-serif
 
@@ -8,15 +9,35 @@ body
     width: 600px
     h1
         font-size: 18px
-
+        
+// frame -----------------------------
 .ds_body
-    width: 600px
+    // width: 600px
+    // margin: 0 auto
+    min-height: 500px
+    min-width: 800px
+    // background: #fff
+    position: relative
+        
+.ds_main
+    // width: 600px
     margin: 0 auto
     min-height: 400px
     background: #fff
-    position: relative
-    // overflow: hidden
+    position: absolute
+    left: 0
+    right: 210px
+    top: 0
+    bottom: 0
+    overflow: hidden
+
+.ds_side
+    position: absolute
+    width: 200px
+    right: 0px
+    min-height: 400px
     
+// map -----------------------------
 .ds_map_hold
     width: 30px
     height: 30px
@@ -26,7 +47,10 @@ body
     // margin-top: -15px
     // margin-left: -15px
         
-.ds_map_focus 
+.ds_map_focus
+    position: relative
+    pointer-events: none
+    z-index: 10
     .ds_box
         width: 29px
         height: 29px
@@ -49,8 +73,8 @@ body
         width: 29px
         height: 29px
         font-size: 10px
-        color: rgba(40,20,80,0.5)
-        background: rgba(40,20,250,0.1)
+        color: rgba(40,20,80,0.1)
+        background: rgba(40,20,250,0.05)
         &:hover
             background: rgba(40,20,250,0.3)
     
@@ -64,13 +88,20 @@ body
     left: 0
     right: 0
     bottom: 0
-    background: rgba(20,200,20,0.2)
+    // background: rgba(20,200,20,0.2)
 
 .ds_data
     position: absolute
     top: 0
     left: 0
     -webkit-user-select: none
+    .ds_box
+        pointer-events: none
+        width: 29px
+        height: 29px
+        font-size: 10px
+        color: rgba(40,20,80,0.8)
+        background: rgba(240,100,100,0.5)
     .ds_case
         width: 30px
         height: 30px
@@ -79,31 +110,61 @@ body
         position: absolute
         &.hover
             .ds_box
-                background: rgba(240,100,100,1)
-                
-    .ds_box
-        pointer-events: none
-        width: 29px
-        height: 29px
-        font-size: 10px
-        color: rgba(40,20,80,0.8)
-        background: rgba(240,100,100,0.5)
-        
-.ds_side
-    position: absolute
-    width: 200px
-    right: -210px
-    min-height: 400px
+                background: rgba(240,100,100,0.9)
+        &[type='round']
+            .ds_box
+                background: rgba(16,73,130,0.5)
+            &.hover .ds_box
+                background: rgba(16,73,130,0.9)
 
+// side -----------------------------
 .ds_side_panel
     background: #fff
     margin-bottom: 10px
     padding: 10px
+    &.fold
+        .ds_form_fold
+            &:after
+                display: block
+            
+        .ds_form_con
+            display: none
 
 .ds_form_tit
     font-size: 14px
-    padding:0 0 10px 0
+    position: relative
+    -webkit-user-select: none
+    .ds_form_fold
+        display: inline-block
+        width: 20px
+        height: 20px
+        // background: #ddd
+        position: absolute
+        right: 0px
+        top: 0px
+        &:hover
+            background: #f7f6f5
+        &:before
+            content: ''
+            position: absolute
+            width: 12px
+            height: 2px
+            background: #aaa
+            top: 9px
+            left: 4px
+        &:after
+            content: ''
+            display: none
+            position: absolute
+            width: 2px
+            height: 12px
+            background: #aaa
+            top: 4px
+            left: 9px
 
+.ds_form_con
+    padding:10px 0 0px 0
+    
 .ds_form_sec
     line-height: 15px
     height: 15px
@@ -120,12 +181,27 @@ body
     color: #666
     margin-bottom: 5px
     padding-left: 5px
+    &:last-child
+        margin-bottom: 0px
+        
     label
         display: inline-block
         width: 20px
         &[size='4']
             width: 40px
+    .ds_select
+        -webkit-appearance: none
+        line-height: 16px
+        font-size: 12px
+        border: 1px solid #eea
+        padding: 3px 3px
+        outline: none
+        background: #ffffdd
+        border-radius: 2px
+        width: 74px
+        
     .ds_input
+        -webkit-appearance: none
         line-height: 16px
         font-size: 12px
         border: 1px solid #eea
@@ -136,3 +212,26 @@ body
         &[size='4']
             width: 30px
             margin-right: 5px
+        &[size='10']
+            width: 74px
+  
+.ds_btn
+    display: inline-block
+    width: 60px
+    line-height: 24px
+    background: #f44
+    color: #fff 
+    text-align: center
+    border-radius: 2px
+    text-decoration: none
+    &[color='green']
+        background: #36bb47
+    
+    .ds_form_row &
+        margin-right: 5px
+
+
+
+
+
+

@@ -1,3 +1,5 @@
+// 本地存储
+var Storage = window.localStorage
 
 // 共享数据
 var Config = {
@@ -5,7 +7,6 @@ var Config = {
         site : 'map.qilei.site'
     }
 }
-
 
 // 主要对象
 var main_config = {
@@ -24,23 +25,35 @@ var main_config = {
             w : [],
             h : [],
         },
+
+        layers : {
+            stone : {},
+            case  : {}
+        },
+
+        // case
         case : {},
         case_d : {
-            name: '1',
-            data: {
-                x: 1,
-                y: 1,
-                w: 1,
-                h: 1
-            },
-            img : 'sprite-1'
+            data: {},
+            blank : true
         },
+        case_stack : [],
+        case_type : ['round', 'stone'],
+
+        side_panel : {
+            data : false,
+            map  : true,
+            case : false,
+        },
+
+        save_status : {
+            save : 0, // 0 default, 1 doing , 2 ok , 3 error
+            restore : 0
+        }
+
     },
 
     watch : {
-        pos : function( newV , oldV){
-            this.update_hold_pos(newV)
-        },
         size : {
             handler : function( newV){
                 this.update_size( newV )
@@ -48,7 +61,15 @@ var main_config = {
             deep: true
         },
         case_d : function( newV , oldV){
-            this.update_case( newV , oldV )
+            oldV.focus = false
+            newV.focus = true
+            // save on change
+            // this.save()
+        },
+        case_stack : function( newV , oldV){
+            if (this.case_stack.length > 10) {
+                this.case_stack.splice(1,1)
+            }
         }
     },
 
@@ -62,15 +83,16 @@ var main_config = {
             w : 20,
             h : 10
         }
-
         this.init_key_bind()
+        this.restore()
     },
 
     methods : {
+
         init_key_bind : function(){
             var _this = this
             window.document.onkeydown = function(e){
-                console.log(e.keyCode)
+                // console.log(e.keyCode)
                 var key = e.keyCode
                 switch ( key ) {    
                     case 87 : // W
@@ -88,10 +110,6 @@ var main_config = {
                 }
             }
             console.log('init key bind')
-        },
-
-        update_hold_pos : function( p ){
-            var s = this.hold_style
         },
 
         update_size : function( size ){
@@ -131,6 +149,7 @@ var main_config = {
                     left : x * 30 + 'px',
                     top  : y * 30 + 'px'
                 },
+                type : 'stone',
                 img : '',
                 focus : false,
                 show  : true
@@ -140,26 +159,37 @@ var main_config = {
             c.name = n
 
             this.$set('case.' + n , c)
-
+            this.case_stack.push( this.case_d )
             this.case_d = this.$get('case.' + n)
-            
             console.log('create: ',n)
         },
 
-        update_case : function( c , o ){
-            o.focus = false
-            c.focus = true
-        },
-
         on_click_case : function( m ){
-            console.log(m)
 
-            this.case_d = m
+            if ( m.name != this.case_d.name ) {
+                this.case_stack.push( this.case_d )
+                this.case_d = m
+                console.log('focus: ',m.name)
+            }
+
         },
-        
+
         on_click_del : function(){
             this.case_d.show = false
-            this.case_d = {}
+            console.log('remove:' , this.case_d.name)
+
+            if ( this.case_stack.length > 2 ) {
+                this.case_d = this.case_stack.pop()
+            }else{
+                this.case_d = this.case_stack[0]
+            }
+
+        },
+
+        on_click_fold : function( d ){
+            var panel = 'side_panel.' + d
+            var flag = this.$get(panel)
+            this.$set(panel , !flag)
         },
 
         box_style : function( m ){
@@ -167,6 +197,36 @@ var main_config = {
                 color : red
             }
             return s
+        },
+
+        save : function(){
+            var t = JSON.stringify( this.$data, null,2)
+            Storage.setItem('data' , t)
+            // console.log(t)
+        },
+
+        restore : function(){
+            var t = Storage.getItem('data')
+            // console.log(t)
+            // console.log()
+            console.log( t )
+            if ( t == null ) {
+                return
+            }
+
+            var json = JSON.parse(t)
+            this.$data = json
+
+            var case_d = {
+                data: {},
+                blank : true
+            }
+
+            // repand case_d
+            var name = this.case_d.name
+            this.case_d = this.$get('case.' + name)
+            // empty stack
+            this.case_stack = [case_d , this.case_d]
         }
     }
 }
