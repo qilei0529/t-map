@@ -15,13 +15,13 @@ var main_config = {
     el: '#main_app',
     data : {
         config : Config.data,
-        version : 1,
+        version : 2,
         pos : {
             x : 0,
             y : 0
         },
 
-        name : '222',
+        name : 'test',
 
         size : {
             w : 0,
@@ -32,23 +32,44 @@ var main_config = {
             w : [],
             h : [],
         },
+
         layers : {
-            stone : {},
-            case  : {}
+
+            stone : {
+                case : {},
+                cur  : {
+                    data: {},
+                    blank : true
+                },
+                type : [ 'stone' , 'round', 'float'],
+                stack : []
+            },
+
+            box   : {
+                case : {},
+                cur  : {
+                    data: {},
+                    blank : true
+                },
+                type : ['door', 'event' , 'case'],
+                stack : []
+            }
+
         },
 
-        // case
-        case : {},
-        case_d : {
-            data: {},
-            blank : true
+        layer_cur : '',
+        layer : {
+            case : {},
+            cur  : {
+                data: {},
+                blank : true
+            },
+            stack : []
         },
-        case_stack : [],
-        case_type : ['round', 'stone'],
 
         side_panel : {
             data : false,
-            map  : true,
+            map  : false,
             case : false,
         },
 
@@ -66,17 +87,24 @@ var main_config = {
             },
             deep: true
         },
-        case_d : function( newV , oldV){
-            oldV.focus = false
-            newV.focus = true
-            // save on change
-            this.save()
-        },
-        case_stack : function( newV , oldV){
-            if (this.case_stack.length > 10) {
-                this.case_stack.splice(1,1)
+
+        'layer.stack' : function( newV , oldV ){
+            if (newV.length > 10) {
+                newV.splice(1,1)
             }
+        },
+
+        'layer_cur' : function( newV , oldV ){
+            this.layer = this.layers[this.layer_cur]
+        },
+
+        'layer.cur' : function( newV , oldV ){
+            if ( oldV ) {
+                oldV.focus = false
+            }
+            newV.focus = true
         }
+
     },
 
     ready : function(){
@@ -90,6 +118,8 @@ var main_config = {
             h : 10
         }
 
+        this.layer_cur = 'stone'
+        // this.layer = this.layers[this.layer_cur]
         this.init_key_bind()
         this.restore()
 
@@ -157,8 +187,9 @@ var main_config = {
                     left : x * 30 + 'px',
                     top  : y * 30 + 'px'
                 },
-                type : 'stone',
+                type : this.layer.type[0],
                 img : '',
+                atlas : '',
                 focus : false,
                 show  : true
             }
@@ -166,30 +197,34 @@ var main_config = {
             var n = 'c_' + x + '_' + y
             c.name = n
 
-            this.$set('case.' + n , c)
-            this.case_stack.push( this.case_d )
-            this.case_d = this.$get('case.' + n)
+            var layer = this.layer
+            this.$set('layer.case.' + n , c)
+            layer.stack.push( layer.cur )
+            layer.cur = this.$get('layer.case.' + n)
             console.log('create: ',n)
         },
 
         on_click_case : function( m ){
 
-            if ( m.name != this.case_d.name ) {
-                this.case_stack.push( this.case_d )
-                this.case_d = m
+            var layer = this.layer
+            if ( m.name != layer.cur.name ) {
+                layer.stack.push( layer.cur )
+                layer.cur = m
                 console.log('focus: ',m.name)
             }
 
         },
 
         on_click_del : function(){
-            this.case_d.show = false
-            console.log('remove:' , this.case_d.name)
 
-            if ( this.case_stack.length > 2 ) {
-                this.case_d = this.case_stack.pop()
+            var layer = this.layer
+            layer.cur.show = false
+            console.log('remove:' , layer.cur.name)
+
+            if ( layer.stack.length > 2 ) {
+                layer.cur = layer.stack.pop()
             }else{
-                this.case_d = this.case_stack[0]
+                layer.cur = layer.stack[0]
             }
 
         },
@@ -198,6 +233,10 @@ var main_config = {
             var panel = 'side_panel.' + d
             var flag = this.$get(panel)
             this.$set(panel , !flag)
+        },
+
+        on_change_layer : function( n ){
+            this.layer_cur = n
         },
 
         box_style : function( m ){
@@ -216,6 +255,9 @@ var main_config = {
             this.save_status.save = 1
 
             var t = JSON.stringify( this.$data, null,2)
+
+            console.log(t)
+
             Storage.setItem('data' , t)
 
             var save_ok = function(){
@@ -224,7 +266,6 @@ var main_config = {
 
             var timer = setTimeout(save_ok, 100)
 
-            // console.log(t)
         },
 
         sync : function(){
@@ -277,30 +318,44 @@ var main_config = {
 
             var stone = []
 
-            for ( c in d.case ) {
-                var s = d.case[c]
-                // console.log(c)
-                var item = {
-                    name : s.name,
-                    type : s.type,
-                    x : parseInt(s.data.x),
-                    y : parseInt(this.size.h) - parseInt(s.data.y) - parseInt(s.data.h),
-                    w : parseInt(s.data.w),
-                    h : parseInt(s.data.h)
+            for ( n in d.layers ) {
+                var layer = d.layers[n]
+
+                var name = n
+                var cases = []
+
+                for ( c in layer.case ) {
+                    var s = layer.case[c]
+                    // console.log(c)
+                    var item = {
+                        name : s.name,
+                        type : s.type,
+                        x : parseInt(s.data.x),
+                        y : parseInt(this.size.h) - parseInt(s.data.y) - parseInt(s.data.h),
+                        w : parseInt(s.data.w),
+                        h : parseInt(s.data.h)
+                    }
+
+                    if ( s.img ) {
+                        item.img = s.img
+                    }
+
+                    if ( s.atlas ) {
+                        item.group = s.atlas
+                    }
+
+                    if (s.show) {
+                        cases.push(item)
+                    }
+
+                    // console.log(item)
                 }
 
-                if (s.show) {
-                    stone.push(item)
-                }
-
-
-                // console.log(item)
+                map[name] = cases
             }
 
-            map.stone = stone
 
             var out = JSON.stringify(map)
-
             t = null
             d = null
             map = null
@@ -326,19 +381,37 @@ var main_config = {
             }
 
             this.$data = json
-
-            var case_d = {
-                data: {},
-                blank : true
-            }
-
-            // repand case_d
-            var name = this.case_d.name
-            this.case_d = this.$get('case.' + name)
-            // empty stack
-            this.case_stack = [case_d , this.case_d]
             this.save_status.save = 0
 
+            this.clear_case_cur()
+            this.layer = this.layers[this.layer_cur]
+        },
+
+        clear_case_cur : function(){
+            console.log('clear cur')
+            for ( n  in this.layers ) {
+                var layer = this.$get('layers.' + n)
+                layer.stack = []
+
+                var name = layer.cur.name || null
+
+                for (c in layer.case ) {
+
+                    var caa = layer.case[c]
+
+                    caa.focus = false
+
+                    console.log(caa)
+                }
+
+                // re cur
+                layer.cur = {
+                    data: {},
+                    blank : true
+                }
+
+                layer.stack.push(layer.cur)
+            }
         }
     }
 }

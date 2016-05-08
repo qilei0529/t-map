@@ -9,7 +9,9 @@ body
     width: 600px
     h1
         font-size: 18px
-    
+        
+div[v-cloak]
+    display: none
         
 // frame -----------------------------
 .ds_body
@@ -26,7 +28,7 @@ body
     min-height: 400px
     background: #fff
     position: absolute
-    left: 0
+    left: 210px
     right: 210px
     top: 0
     bottom: 0
@@ -36,6 +38,12 @@ body
     position: absolute
     width: 200px
     right: 0px
+    min-height: 400px
+    
+.ds_side_left
+    position: absolute
+    width: 200px
+    left: 0px
     min-height: 400px
     
 // map -----------------------------
@@ -89,20 +97,36 @@ body
     left: 0
     right: 0
     bottom: 0
+    z-index: 4
     // background: rgba(20,200,20,0.2)
+
+.ds_data_ranbow
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    z-index: 2
+    background: rgba(255,255,255,0)
 
 .ds_data
     position: absolute
     top: 0
     left: 0
     -webkit-user-select: none
+    &.hide
+        pointer-events: none
+        opacity: 0.5
+    &.cur
+        z-index: 5
     .ds_box
         pointer-events: none
         width: 29px
         height: 29px
         font-size: 10px
         color: rgba(40,20,80,0.8)
-        background: rgba(240,100,100,0.5)
+        background: rgba(240,100,100,0.9)
+        opacity : 0.6
     .ds_case
         width: 30px
         height: 30px
@@ -111,12 +135,17 @@ body
         position: absolute
         &.hover
             .ds_box
-                background: rgba(240,100,100,0.9)
+                opacity : 1
+        &[type='stone']
+            .ds_box
+                background: rgba(131,93,98,0.9)
         &[type='round']
             .ds_box
+                background: rgba(13,14,36,0.9)
+                
+        &[type='door']
+            .ds_box
                 background: rgba(16,73,130,0.5)
-            &.hover .ds_box
-                background: rgba(16,73,130,0.9)
 
 // side -----------------------------
 .ds_side_panel
@@ -199,7 +228,7 @@ body
         outline: none
         background: #ffffdd
         border-radius: 2px
-        width: 74px
+        width: 82px
         
     .ds_input
         -webkit-appearance: none
@@ -215,7 +244,20 @@ body
             margin-right: 5px
         &[size='10']
             width: 74px
-  
+.ds_layer
+    font-size: 12px
+    padding: 5px 0 10px
+    .ds_layer_line
+        line-height: 20px
+        text-align: right
+        padding-right: 5px
+        border: 1px solid #fff
+        cursor: default
+        &:hover
+            background: #f7f6f5
+        &.cur
+            border: 1px solid #eea
+            background: #ffffdd
 .ds_btn
     display: inline-block
     width: 54px

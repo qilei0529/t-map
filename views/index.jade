@@ -22,17 +22,22 @@ block content
               div(class='ds_grid' v-for='x in size_grid.w')
                 div(class='ds_box') {{x}},{{y}}
           //- data 渲染 地图系统
-          div(class='ds_data')
+          div(class='ds_data_ranbow'
+            v-bind:style='{ width : size.w * 30 + "px" ,height : size.h * 30 + "px" }')
+          div(class='ds_data' v-bind:class='{ hide : layer_cur != n , cur : layer_cur == n}' v-for='(n, layer) in layers')
             div(class='ds_case' 
               v-on:click='on_click_case( m )' 
-              v-if='m.show' v-for='m in case'
+              v-if='m.show' v-for='m in layer.case'
               v-bind:type='m.type' 
               v-bind:class='{ hover : m.focus }' 
               v-bind:style='{ left : m.data.x * 30 + "px" ,top : m.data.y * 30 + "px" ,width : m.data.w * 30 + "px" ,height : m.data.h * 30 + "px" }' 
               )
               div(class='ds_box' v-bind:style='{ width : (m.data.w * 30 - 1)  + "px" ,height : (m.data.h * 30 - 1) + "px" }') {{m.data.x}},{{m.data.y}}
+
+
     //- 侧边栏
-    div(class='ds_side')
+    div(class='ds_side_left')
+      //- 数据
       div(class='ds_data_form ds_side_panel' v-bind:class='{ fold : side_panel.data }')
         div(class='ds_form_tit') 数据
           div(class='ds_form_fold' v-on:click='on_click_fold("data")')
@@ -42,14 +47,20 @@ block content
             a(class='ds_btn' color='green'  href='' v-on:click.prevent='restore()' ) 恢复
 
             a(class='ds_btn' color='blue'  href='' v-on:click.prevent='sync()' ) 同步  {{ save_status.sync == 1? '...':'' }}
+      
       //- 关卡 面板
       div(class='ds_map_form ds_side_panel' v-bind:class='{ fold : side_panel.map }')
         div(class='ds_form_tit') 关卡属性
           div(class='ds_form_fold' v-on:click='on_click_fold("map")')
         div(class='ds_form_con')
+          div(class='ds_form_sec') base
           div(class='ds_form_row')
             label(size='4') name:
             input(class='ds_input' size='10' v-model='name')
+          div(class='ds_form_sec') layer
+          div(class='ds_layer')
+            div(class='ds_layer_line' v-bind:class='{ cur : layer_cur == t}' v-for='(t,b) in layers' v-on:click='on_change_layer(t)') {{t}}
+
           div(class='ds_form_sec') pos
           div(class='ds_form_row')
             label x:
@@ -62,6 +73,7 @@ block content
             label h:
             input(class='ds_input' size='4'  v-model='size.h')
 
+    div(class='ds_side')
       //- 盒子面板
       div(class='ds_case_form ds_side_panel' v-bind:class='{ fold : side_panel.case }')
         div(class='ds_form_tit') 盒子属性
@@ -70,28 +82,31 @@ block content
           div(class='ds_form_sec') name
           div(class='ds_form_row')
             label(size='4') id:
-            input(class='ds_input' size='10' v-model='case_d.name')
+            input(class='ds_input' size='10' v-model='layer.cur.name')
           div(class='ds_form_sec') box
           div(class='ds_form_row')
             label x:
-            input(class='ds_input' size='4'  v-model='case_d.data.x')
+            input(class='ds_input' size='4'  v-model='layer.cur.data.x')
             label y:
-            input(class='ds_input' size='4'  v-model='case_d.data.y')
+            input(class='ds_input' size='4'  v-model='layer.cur.data.y')
           div(class='ds_form_row')
             label w:
-            input(class='ds_input' size='4'  v-model='case_d.data.w')
+            input(class='ds_input' size='4'  v-model='layer.cur.data.w')
             label h:
-            input(class='ds_input' size='4'  v-model='case_d.data.h')
+            input(class='ds_input' size='4'  v-model='layer.cur.data.h')
           div(class='ds_form_sec') sprite
           div(class='ds_form_row')
             label(size='4') type:
-            select(class='ds_select' v-model='case_d.type')
-              option( v-for='t in case_type' value='{{t}}') {{t}}
+            select(class='ds_select' v-model='layer.cur.type')
+              option( v-for='t in layer.type' value='{{t}}') {{t}}
           div(class='ds_form_row')
             label(size='4') img:
-            input(class='ds_input' size='10' v-model='case_d.img')
+            input(class='ds_input' size='10' v-model='layer.cur.img')
           div(class='ds_form_row')
-            a(class='ds_btn'  href='' v-on:click.prevent='on_click_del()' v-if='case_d.blank == null') 移除
+            label(size='4') atlas:
+            input(class='ds_input' size='10' v-model='layer.cur.atlas')
+          div(class='ds_form_row')
+            a(class='ds_btn'  href='' v-on:click.prevent='on_click_del()' v-if='layer.cur.blank == null') 移除
   div(class='ds_foot')
     div 快捷键 w上，s下，a左 ，d右
   script(src='/js/vue.js')
