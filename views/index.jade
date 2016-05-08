@@ -1,18 +1,21 @@
 extends layout
 
 block content
-  div(class='ds_header' )
+  div(class='ds_header')
     h1= title
-  div(class='ds_body' id='main_app')
+  div(class='ds_body' id='main_app' v-cloak )
     //- 主体部分
     div(class='ds_main')
       //- hold
       div(class='ds_map_hold')
         div(class='ds_map_focus')
           div(class='ds_box')
-        div(class='ds_map' v-bind:style='{ left : -pos.x * 30 + "px" ,top : -pos.y * 30 + "px" }')
+        div(class='ds_map'
+          v-bind:style='{ left : -pos.x * 30 + "px" ,top : -pos.y * 30 + "px" }')
           //- hover 获取 鼠标事件
-          div(class='ds_hover' v-bind:style='{ width : size.w * 30 + "px" ,height : size.h * 30 + "px" }' @click='on_mouse_down( $event )')
+          div(class='ds_hover'
+            v-bind:style='{ width : size.w * 30 + "px" ,height : size.h * 30 + "px" }'
+            v-on:click='on_mouse_down( $event )')
           //- root 渲染 栅格系统
           div(class='ds_root')
             div(class='ds_grid_line' v-bind:style='{width: size.w * 30 + "px"}' v-for='y in size_grid.h')
@@ -20,22 +23,33 @@ block content
                 div(class='ds_box') {{x}},{{y}}
           //- data 渲染 地图系统
           div(class='ds_data')
-            div(class='ds_case' v-if='m.show' v-bind:type='m.type' v-bind:class='{ hover : m.focus }' @click='on_click_case( m )' v-bind:style='{ left : m.data.x * 30 + "px" ,top : m.data.y * 30 + "px" ,width : m.data.w * 30 + "px" ,height : m.data.h * 30 + "px" }' v-for='m in case')
+            div(class='ds_case' 
+              v-on:click='on_click_case( m )' 
+              v-if='m.show' v-for='m in case'
+              v-bind:type='m.type' 
+              v-bind:class='{ hover : m.focus }' 
+              v-bind:style='{ left : m.data.x * 30 + "px" ,top : m.data.y * 30 + "px" ,width : m.data.w * 30 + "px" ,height : m.data.h * 30 + "px" }' 
+              )
               div(class='ds_box' v-bind:style='{ width : (m.data.w * 30 - 1)  + "px" ,height : (m.data.h * 30 - 1) + "px" }') {{m.data.x}},{{m.data.y}}
     //- 侧边栏
     div(class='ds_side')
       div(class='ds_data_form ds_side_panel' v-bind:class='{ fold : side_panel.data }')
         div(class='ds_form_tit') 数据
-          div(class='ds_form_fold' @click='on_click_fold("data")')
+          div(class='ds_form_fold' v-on:click='on_click_fold("data")')
         div(class='ds_form_con')
           div(class='ds_form_row')
-            a(class='ds_btn' color='red'  href='' @click.prevent='save()' ) 保存
-            a(class='ds_btn' color='green'  href='' @click.prevent='restore()' ) 恢复
+            a(class='ds_btn' color='red'  href='' v-on:click.prevent='save()' ) 保存 {{ save_status.save == 1? '...':'' }}
+            a(class='ds_btn' color='green'  href='' v-on:click.prevent='restore()' ) 恢复
+
+            a(class='ds_btn' color='blue'  href='' v-on:click.prevent='sync()' ) 同步  {{ save_status.sync == 1? '...':'' }}
       //- 关卡 面板
       div(class='ds_map_form ds_side_panel' v-bind:class='{ fold : side_panel.map }')
         div(class='ds_form_tit') 关卡属性
-          div(class='ds_form_fold' @click='on_click_fold("map")')
+          div(class='ds_form_fold' v-on:click='on_click_fold("map")')
         div(class='ds_form_con')
+          div(class='ds_form_row')
+            label(size='4') name:
+            input(class='ds_input' size='10' v-model='name')
           div(class='ds_form_sec') pos
           div(class='ds_form_row')
             label x:
@@ -51,7 +65,7 @@ block content
       //- 盒子面板
       div(class='ds_case_form ds_side_panel' v-bind:class='{ fold : side_panel.case }')
         div(class='ds_form_tit') 盒子属性
-          div(class='ds_form_fold' @click='on_click_fold("case")')
+          div(class='ds_form_fold' v-on:click='on_click_fold("case")')
         div(class='ds_form_con')
           div(class='ds_form_sec') name
           div(class='ds_form_row')
@@ -77,7 +91,9 @@ block content
             label(size='4') img:
             input(class='ds_input' size='10' v-model='case_d.img')
           div(class='ds_form_row')
-            a(class='ds_btn'  href='' @click.prevent='on_click_del()' v-if='case_d.blank == null') 移除
-
+            a(class='ds_btn'  href='' v-on:click.prevent='on_click_del()' v-if='case_d.blank == null') 移除
+  div(class='ds_foot')
+    div 快捷键 w上，s下，a左 ，d右
   script(src='/js/vue.js')
+  script(src='/js/jquery.js')
   script(src='/js/main.js')

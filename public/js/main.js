@@ -1,6 +1,7 @@
 // 本地存储
 var Storage = window.localStorage
 
+
 // 共享数据
 var Config = {
     data : {
@@ -8,24 +9,29 @@ var Config = {
     }
 }
 
+
 // 主要对象
 var main_config = {
     el: '#main_app',
     data : {
         config : Config.data,
+        version : 1,
         pos : {
             x : 0,
             y : 0
         },
+
+        name : '222',
+
         size : {
             w : 0,
             h : 0,
         },
+
         size_grid : {
             w : [],
             h : [],
         },
-
         layers : {
             stone : {},
             case  : {}
@@ -48,9 +54,9 @@ var main_config = {
 
         save_status : {
             save : 0, // 0 default, 1 doing , 2 ok , 3 error
-            restore : 0
-        }
-
+            restore : 0,
+            sync : 0
+        },
     },
 
     watch : {
@@ -64,7 +70,7 @@ var main_config = {
             oldV.focus = false
             newV.focus = true
             // save on change
-            // this.save()
+            this.save()
         },
         case_stack : function( newV , oldV){
             if (this.case_stack.length > 10) {
@@ -83,8 +89,10 @@ var main_config = {
             w : 20,
             h : 10
         }
+
         this.init_key_bind()
         this.restore()
+
     },
 
     methods : {
@@ -200,21 +208,123 @@ var main_config = {
         },
 
         save : function(){
+            var key = this.save_status.save 
+            if ( key == 1 ) {
+                return
+            }
+            var _this = this
+            this.save_status.save = 1
+
             var t = JSON.stringify( this.$data, null,2)
             Storage.setItem('data' , t)
+
+            var save_ok = function(){
+                _this.save_status.save = 0
+            }
+
+            var timer = setTimeout(save_ok, 100)
+
             // console.log(t)
+        },
+
+        sync : function(){
+            console.log('sync')
+
+            if (this.save_status.sync == 1) {
+                return
+            }
+
+            var url = "./c/map"
+            var data = {
+                name : this.name,
+                map : this.format_data()
+            }
+
+            var _this = this
+
+            _this.save_status.sync = 1
+
+            var cb = function( a, b ){
+                console.log( a, b)
+                _this.save_status.sync = 0
+            }
+            console.log(data)
+            // return
+            do_post(url , data , cb)
+
+        },
+
+        // format map data
+        format_data : function(){
+
+            var t = JSON.stringify( this.$data, null,2)
+            var d = JSON.parse(t)
+
+            var map = {
+                name : d.name,
+                texture : ['hero'],
+                size : d.size,
+                hero : {
+                    x: 2,
+                    y: 3
+                },
+                layer : [],
+                map   : [],
+                ready : {},
+                stone : [],
+                box   : []
+            }
+
+            var stone = []
+
+            for ( c in d.case ) {
+                var s = d.case[c]
+                // console.log(c)
+                var item = {
+                    name : s.name,
+                    type : s.type,
+                    x : parseInt(s.data.x),
+                    y : parseInt(this.size.h) - parseInt(s.data.y) - parseInt(s.data.h),
+                    w : parseInt(s.data.w),
+                    h : parseInt(s.data.h)
+                }
+
+                if (s.show) {
+                    stone.push(item)
+                }
+
+
+                // console.log(item)
+            }
+
+            map.stone = stone
+
+            var out = JSON.stringify(map)
+
+            t = null
+            d = null
+            map = null
+            // console.log(d)
+            return out
         },
 
         restore : function(){
             var t = Storage.getItem('data')
-            // console.log(t)
-            // console.log()
-            console.log( t )
             if ( t == null ) {
                 return
             }
 
             var json = JSON.parse(t)
+
+            var v = this.version
+
+            var v_new = json.version || 0
+
+            if ( v != v_new ) {
+                Storage.removeItem('data')
+                return
+            }
+
             this.$data = json
 
             var case_d = {
@@ -227,8 +337,22 @@ var main_config = {
             this.case_d = this.$get('case.' + name)
             // empty stack
             this.case_stack = [case_d , this.case_d]
+            this.save_status.save = 0
+
         }
     }
+}
+
+
+var do_post = function(url, data, cb){
+    $.ajax({
+        type: "post",
+        url : url,
+        dataType: "json",
+        data: data || {},
+        success: cb || function (e) { console.log(e)},
+        error: function (e) { console.log(e)}
+    })
 }
 
 // 启动vue
