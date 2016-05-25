@@ -106,6 +106,10 @@ div[v-cloak] {
   z-index: 2;
   background: rgba(255,255,255,0);
 }
+.ds_data_hero {
+  z-index: 10;
+  pointer-events: none;
+}
 .ds_data {
   position: absolute;
   top: 0;
@@ -134,6 +138,9 @@ div[v-cloak] {
   text-align: center;
   line-height: 30px;
   position: absolute;
+}
+.ds_data .ds_case:hover .ds_box {
+  opacity: 0.8;
 }
 .ds_data .ds_case.hover .ds_box {
   opacity: 1;
@@ -204,6 +211,130 @@ div[v-cloak] {
   padding: 4px;
   margin-bottom: 5px;
   color: #666;
+  position: relative;
+}
+.ds_form_sec_op {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+}
+.ds_form_area {
+  padding-left: 5px;
+}
+.ds_form_area .ds_textarea {
+  margin: 0;
+  -webkit-appearance: none;
+  line-height: 16px;
+  font-size: 12px;
+  border: 1px solid #eea;
+  padding: 3px 3px;
+  outline: none;
+  background: #ffd;
+  border-radius: 2px;
+}
+.ds_form_area .ds_textarea[size='10'] {
+  width: 170px;
+}
+.ds_form_action {
+  position: relative;
+}
+.ds_action_float {
+  position: absolute;
+  width: 220px;
+  min-height: 100px;
+  background: #fff;
+  top: -30px;
+  right: 200px;
+  border: 1px solid #f7f6f5;
+  border-radius: 4px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  padding: 5px;
+  z-index: 20;
+}
+.ds_action_float .ds_textarea {
+  min-height: 120px;
+  width: 200px;
+}
+.ds_form_close {
+  position: absolute;
+  top: 2px;
+  right: 0px;
+  width: 20px;
+  height: 20px;
+}
+.ds_form_close:hover {
+  background: #f7f6f5;
+}
+.ds_form_close span {
+  display: block;
+  width: 20px;
+  height: 20px;
+  position: relative;
+  -webkit-transform: rotate(45deg);
+}
+.ds_form_close span:before {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 2px;
+  background: #aaa;
+  top: 9px;
+  left: 4px;
+}
+.ds_form_close span:after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 12px;
+  background: #aaa;
+  top: 4px;
+  left: 9px;
+}
+.ds_form_error {
+  font-size: 10px;
+  color: #a66;
+  background: #fee;
+  line-height: 20px;
+}
+.ds_action_list {
+  padding-bottom: 10px;
+}
+.ds_action_list .ds_action_item {
+  font-size: 10px;
+  line-height: 20px;
+  height: 20px;
+  padding: 0 5px;
+  cursor: default;
+  border: 1px solid #fff;
+  position: relative;
+  -webkit-user-select: none;
+}
+.ds_action_list .ds_action_item:hover {
+  background: #f7f6f5;
+}
+.ds_action_list .ds_action_item.cur {
+  border: 1px solid #eea;
+  background: #ffd;
+}
+.ds_action_list .ds_action_item .del {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  background: #ddd;
+  line-height: 15px;
+  text-align: center;
+}
+.ds_action_add {
+  font-size: 10px;
+  text-align: center;
+  line-height: 20px;
+}
+.ds_action_add:hover {
+  background: #f7f6f5;
+  cursor: pointer;
 }
 .ds_form_row {
   line-height: 30px;

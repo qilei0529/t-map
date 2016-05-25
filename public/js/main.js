@@ -15,7 +15,7 @@ var main_config = {
     el: '#main_app',
     data : {
         config : Config.data,
-        version : 2,
+        version : 3,
         pos : {
             x : 0,
             y : 0
@@ -33,6 +33,11 @@ var main_config = {
             h : [],
         },
 
+        hero : {
+            x: 3,
+            y: 7
+        },
+
         layers : {
 
             stone : {
@@ -42,7 +47,7 @@ var main_config = {
                     blank : true
                 },
                 type : [ 'stone' , 'round', 'float'],
-                stack : []
+                stack : [],
             },
 
             box   : {
@@ -52,7 +57,7 @@ var main_config = {
                     blank : true
                 },
                 type : ['door', 'event' , 'case'],
-                stack : []
+                stack : [],
             }
 
         },
@@ -64,7 +69,31 @@ var main_config = {
                 data: {},
                 blank : true
             },
-            stack : []
+            stack : [],
+        },
+
+        side_model : {
+            ready : {
+                name   : 'ready',
+                flage  : false, 
+                index  : -1,
+                stack  : [],
+                text    : ''
+            },
+            move : {
+                name   : 'move',
+                flage  : false, 
+                index  : -1,
+                stack  : [],
+                text    : ''
+            },
+            action : {
+                name   : 'action',
+                flage  : false, 
+                index  : -1,
+                stack  : [],
+                text : ''
+            },
         },
 
         side_panel : {
@@ -103,7 +132,8 @@ var main_config = {
                 oldV.focus = false
             }
             newV.focus = true
-        }
+
+        },
 
     },
 
@@ -191,7 +221,10 @@ var main_config = {
                 img : '',
                 atlas : '',
                 focus : false,
-                show  : true
+                show  : true,
+                ready : [],
+                action : [],
+                move : [],
             }
 
             var n = 'c_' + x + '_' + y
@@ -239,6 +272,80 @@ var main_config = {
             this.layer_cur = n
         },
 
+        // move
+        on_click_action : function( m , i, a){
+            console.log('show move panel')
+            m.index = i
+            m.text  = JSON.stringify( a , null,2)
+            m.box   = this.layer.cur
+            m.flag  = true
+        },
+        on_del_action : function( m , i){
+            console.log('del ', i)
+            // console.log(m)
+            m.splice(i, 1)
+        },
+
+        on_move_add : function(){
+            console.log('add move')
+
+            if ( this.layer.cur.move ) {
+                var move = this.layer.cur.move
+                var a = {
+                    "name"   : "move",
+                    "repeat" : 1 ,
+                    "step" : [
+                        {
+                            "event" : "move",
+                            "dur"   : 2,
+                            "x": -2,
+                            "y": 0,
+                        },
+                        {
+                            "event" : "wait",
+                            "dur"  : 2
+                        },
+                        {
+                            "event" : "move",
+                            "dur"   : 2,
+                            "x": 2,
+                            "y": 0,
+                        },
+                        {
+                            "event" : "wait",
+                            "dur"  : 2
+                        }
+                    ],
+                }
+                move.push( a )
+            }
+
+        },
+
+        // action
+        on_ready_add : function(){
+            console.log('add action')
+            if ( this.layer.cur.ready ) {
+                var action = this.layer.cur.ready
+                var a = {
+                    event : 'move'
+                }
+                action.push( a )
+            }
+        },
+
+        // action
+        on_action_add : function(){
+            console.log('add action')
+            if ( this.layer.cur.action ) {
+                var action = this.layer.cur.action
+                var a = {
+                    event : 'show'
+                }
+                action.push( a )
+            }
+        },
+
         box_style : function( m ){
             var s = {
                 color : red
@@ -247,6 +354,7 @@ var main_config = {
         },
 
         save : function(){
+
             var key = this.save_status.save 
             if ( key == 1 ) {
                 return
@@ -290,7 +398,6 @@ var main_config = {
                 _this.save_status.sync = 0
             }
             console.log(data)
-            // return
             do_post(url , data , cb)
 
         },
@@ -333,8 +440,13 @@ var main_config = {
                         x : parseInt(s.data.x),
                         y : parseInt(this.size.h) - parseInt(s.data.y) - parseInt(s.data.h),
                         w : parseInt(s.data.w),
-                        h : parseInt(s.data.h)
+                        h : parseInt(s.data.h),
+                        motion : [],
+                        action : [],
+                        init : []
                     }
+
+                    console.log(s)
 
                     if ( s.img ) {
                         item.img = s.img
@@ -342,6 +454,18 @@ var main_config = {
 
                     if ( s.atlas ) {
                         item.group = s.atlas
+                    }
+
+                    if ( s.move ) {
+                        item.motion = s.move
+                    }
+
+                    if ( s.action ) {
+                        item.action = s.action
+                    }
+
+                    if ( s.ready ) {
+                        item.init = s.ready
                     }
 
                     if (s.show) {
@@ -354,13 +478,36 @@ var main_config = {
                 map[name] = cases
             }
 
-
+            console.log(map)
             var out = JSON.stringify(map)
             t = null
             d = null
             map = null
             // console.log(d)
             return out
+        },
+
+        clean : function(){
+            console.log('clean')
+            for ( n in this.layers ) {
+
+                var layer = this.$get('layers.' + n)
+
+                // case
+                layer.case = {}
+
+                // stack
+                layer.stack = []
+
+                // re cur
+                layer.cur = {
+                    data: {},
+                    blank : true
+                }
+
+                layer.stack.push(layer.cur)
+            }
+
         },
 
         restore : function(){
@@ -401,7 +548,7 @@ var main_config = {
 
                     caa.focus = false
 
-                    console.log(caa)
+                    // console.log(caa)
                 }
 
                 // re cur
@@ -427,6 +574,77 @@ var do_post = function(url, data, cb){
         error: function (e) { console.log(e)}
     })
 }
+
+var side_float_config = {
+    template: '#ds_action_float',
+    props: ['data'],
+    data: function () {
+        return {
+            error : null,
+            flag : false
+        }
+    },
+    watch : {
+        data : {
+            handler : function( newV ){
+                var d = newV
+                this.flag = this.data.flag
+            },
+            deep: true
+        },
+        'data.text' : function( newV ){
+            this.save()
+        }
+    },
+    methods: {
+        clear : function(){
+            console.log('clear' , this.data.name)
+            this.flag = this.data.flag = false
+        },
+
+        save : function(){
+            console.log('save' , this.data.name)
+            var name = this.data.name
+            var box  = this.data.box 
+            var i    = this.data.index
+            var data = ''
+
+            var text = this.data.text
+            var json = null
+
+            try {
+                json = JSON.parse(text)
+                this.error = null
+                if ( box ) {
+                    switch ( name ) {
+                        case  'move':
+                            box.move.splice( i , 1 , json )
+                            break
+                        case  'action':
+                            ac = box.action
+                            box.action.splice( i , 1 , json )
+                            break
+                        case  'ready':
+                            ac = box.action
+                            box.ready.splice( i , 1 , json )
+                            break
+                        default : 
+                            break 
+                    }
+                }
+
+                console.log(box.move)
+            }   
+            catch(e){   
+                console.log( e )
+                this.error = 'error format'
+            }
+        }
+    }
+}
+
+// 注册组件
+Vue.component('side-float', side_float_config)
 
 // 启动vue
 var vm_main = new Vue( main_config )

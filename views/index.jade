@@ -20,7 +20,7 @@ block content
           div(class='ds_root')
             div(class='ds_grid_line' v-bind:style='{width: size.w * 30 + "px"}' v-for='y in size_grid.h')
               div(class='ds_grid' v-for='x in size_grid.w')
-                div(class='ds_box') {{x}},{{y}}
+                div(class='ds_box')  {{ x % 5 == 0 || y % 5 == 0 ? x + ',' + y :'' }}
           //- data 渲染 地图系统
           div(class='ds_data_ranbow'
             v-bind:style='{ width : size.w * 30 + "px" ,height : size.h * 30 + "px" }')
@@ -32,7 +32,11 @@ block content
               v-bind:class='{ hover : m.focus }' 
               v-bind:style='{ left : m.data.x * 30 + "px" ,top : m.data.y * 30 + "px" ,width : m.data.w * 30 + "px" ,height : m.data.h * 30 + "px" }' 
               )
-              div(class='ds_box' v-bind:style='{ width : (m.data.w * 30 - 1)  + "px" ,height : (m.data.h * 30 - 1) + "px" }') {{m.data.x}},{{m.data.y}}
+              div(class='ds_box' v-bind:style='{ width : (m.data.w * 30 - 1)  + "px" ,height : (m.data.h * 30 - 1) + "px" }') {{ m.data.x }},{{m.data.y}}
+          div(class='ds_data ds_data_hero')
+            div(class='ds_case ds_case_hero'
+              v-bind:style='{ left : ( hero.x * 30 ) + "px" , top : ( hero.y * 30 ) + "px"}' )
+              div(class='ds_box') hero
 
 
     //- 侧边栏
@@ -44,7 +48,7 @@ block content
         div(class='ds_form_con')
           div(class='ds_form_row')
             a(class='ds_btn' color='red'  href='' v-on:click.prevent='save()' ) 保存 {{ save_status.save == 1? '...':'' }}
-            a(class='ds_btn' color='green'  href='' v-on:click.prevent='restore()' ) 恢复
+            a(class='ds_btn' color='green'  href='' v-on:click.prevent='clean()' ) 清空
 
             a(class='ds_btn' color='blue'  href='' v-on:click.prevent='sync()' ) 同步  {{ save_status.sync == 1? '...':'' }}
       
@@ -61,17 +65,26 @@ block content
           div(class='ds_layer')
             div(class='ds_layer_line' v-bind:class='{ cur : layer_cur == t}' v-for='(t,b) in layers' v-on:click='on_change_layer(t)') {{t}}
 
-          div(class='ds_form_sec') pos
+          div(class='ds_form_sec') focus
           div(class='ds_form_row')
             label x:
             input(class='ds_input' size='4'  v-model='pos.x')
             label y:
             input(class='ds_input' size='4'  v-model='pos.y')
+
+          div(class='ds_form_sec') size
           div(class='ds_form_row')
             label w:
             input(class='ds_input' size='4'  v-model='size.w')
             label h:
             input(class='ds_input' size='4'  v-model='size.h')
+
+          div(class='ds_form_sec') hero - pos
+          div(class='ds_form_row')
+            label x:
+            input(class='ds_input' size='4'  v-model='hero.x')
+            label y:
+            input(class='ds_input' size='4'  v-model='hero.y')
 
     div(class='ds_side')
       //- 盒子面板
@@ -105,10 +118,57 @@ block content
           div(class='ds_form_row')
             label(size='4') atlas:
             input(class='ds_input' size='10' v-model='layer.cur.atlas')
+
+          //- move
+          div(class='ds_form_sec') move
+            div(class='ds_action_add ds_form_sec_op' v-on:click.stop='on_move_add()') +add move
+          div(class='ds_form_area ds_form_action')
+            div(class='ds_action_list')
+              div(class='ds_action_item'
+                v-bind:class='{cur : side_model.move.index == i }'
+                v-on:click.stop='on_click_action( side_model.move , i , a )'
+                v-for='(i, a) in layer.cur.move' ) {{ a.name }} {{ a.repeat ? 'repeat - ' + a.repeat : '' }} {{ a.step.length ? 'step - ' + a.step.length : '--' }}
+                span(class='del' v-on:click.stop='on_del_action( layer.cur.move,i)') x
+            side-float( :data='side_model.move' )
+
+          //- action
+          div(class='ds_form_sec') action
+            div(class='ds_action_add ds_form_sec_op' v-on:click.stop='on_action_add()') +add action
+          div(class='ds_form_area ds_form_action')
+            div(class='ds_action_list')
+              div(class='ds_action_item'
+                v-bind:class='{cur : side_model.action.index == i }'
+                v-on:click.stop='on_click_action( side_model.action , i , a )'
+                v-for='(i, a) in layer.cur.action' ) {{ a.target }} {{ a.node }} {{ a.event }}
+                span(class='del' v-on:click.stop='on_del_action(layer.cur.action,i)') x
+            side-float( :data='side_model.action' )
+          //- ready
+          div(class='ds_form_sec') ready
+            div(class='ds_action_add ds_form_sec_op' v-on:click.stop='on_ready_add()') +add ready
+          div(class='ds_form_area ds_form_action')
+            div(class='ds_action_list')
+              div(class='ds_action_item'
+                v-bind:class='{cur : side_model.ready.index == i }'
+                v-on:click.stop='on_click_action( side_model.ready , i , a )'
+                v-for='(i, a) in layer.cur.ready' ) {{ a.target }} {{ a.node }} {{ a.event }}
+                span(class='del' v-on:click.stop='on_del_action(layer.cur.ready,i)') x
+            side-float( :data='side_model.ready' )
+
           div(class='ds_form_row')
-            a(class='ds_btn'  href='' v-on:click.prevent='on_click_del()' v-if='layer.cur.blank == null') 移除
+            a(class='ds_btn' href='' v-on:click.stop='on_click_del()' v-if='layer.cur.blank == null') 移除
+
   div(class='ds_foot')
     div 快捷键 w上，s下，a左 ，d右
+
+  template(id='ds_action_float')
+    div(class='ds_action_float' v-bind:class='data.name' v-if='flag')
+      div(class='ds_form_sec') {{ data.name }}
+        div(class='ds_form_close' v-on:click.prevent='clear()')
+          span
+      div(class='ds_form_area')
+        textarea(class='ds_textarea' v-on:change='save()' v-model='data.text')
+        div(class='ds_form_error' v-if='error') {{ error }}
+
   script(src='/js/vue.js')
   script(src='/js/jquery.js')
   script(src='/js/main.js')
