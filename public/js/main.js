@@ -253,7 +253,6 @@ var main_config = {
             var layer = this.layer
             layer.cur.show = false
             console.log('remove:' , layer.cur.name)
-
             if ( layer.stack.length > 2 ) {
                 layer.cur = layer.stack.pop()
             }else{

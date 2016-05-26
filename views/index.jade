@@ -121,41 +121,41 @@ block content
 
           //- move
           div(class='ds_form_sec') move
-            div(class='ds_action_add ds_form_sec_op' v-on:click.stop='on_move_add()') +add move
+            div(class='ds_action_add ds_form_sec_op' v-on:click='on_move_add()') +add move
           div(class='ds_form_area ds_form_action')
             div(class='ds_action_list')
               div(class='ds_action_item'
                 v-bind:class='{cur : side_model.move.index == i }'
-                v-on:click.stop='on_click_action( side_model.move , i , a )'
+                v-on:click='on_click_action( side_model.move , i , a )'
                 v-for='(i, a) in layer.cur.move' ) {{ a.name }} {{ a.repeat ? 'repeat - ' + a.repeat : '' }} {{ a.step.length ? 'step - ' + a.step.length : '--' }}
-                span(class='del' v-on:click.stop='on_del_action( layer.cur.move,i)') x
+                span(class='del' v-on:click='on_del_action( layer.cur.move,i)') x
             side-float( :data='side_model.move' )
 
           //- action
           div(class='ds_form_sec') action
-            div(class='ds_action_add ds_form_sec_op' v-on:click.stop='on_action_add()') +add action
+            div(class='ds_action_add ds_form_sec_op' v-on:click='on_action_add()') +add action
           div(class='ds_form_area ds_form_action')
             div(class='ds_action_list')
               div(class='ds_action_item'
                 v-bind:class='{cur : side_model.action.index == i }'
-                v-on:click.stop='on_click_action( side_model.action , i , a )'
+                v-on:click='on_click_action( side_model.action , i , a )'
                 v-for='(i, a) in layer.cur.action' ) {{ a.target }} {{ a.node }} {{ a.event }}
-                span(class='del' v-on:click.stop='on_del_action(layer.cur.action,i)') x
+                span(class='del' v-on:click='on_del_action(layer.cur.action,i)') x
             side-float( :data='side_model.action' )
           //- ready
           div(class='ds_form_sec') ready
-            div(class='ds_action_add ds_form_sec_op' v-on:click.stop='on_ready_add()') +add ready
+            div(class='ds_action_add ds_form_sec_op' v-on:click='on_ready_add()') +add ready
           div(class='ds_form_area ds_form_action')
             div(class='ds_action_list')
               div(class='ds_action_item'
                 v-bind:class='{cur : side_model.ready.index == i }'
-                v-on:click.stop='on_click_action( side_model.ready , i , a )'
+                v-on:click='on_click_action( side_model.ready , i , a )'
                 v-for='(i, a) in layer.cur.ready' ) {{ a.target }} {{ a.node }} {{ a.event }}
-                span(class='del' v-on:click.stop='on_del_action(layer.cur.ready,i)') x
+                span(class='del' v-on:click='on_del_action(layer.cur.ready,i)') x
             side-float( :data='side_model.ready' )
 
           div(class='ds_form_row')
-            a(class='ds_btn' href='' v-on:click.stop='on_click_del()' v-if='layer.cur.blank == null') 移除
+            a(class='ds_btn' href='' v-on:click.prevent='on_click_del()' v-if='layer.cur.blank == null') 移除
 
   div(class='ds_foot')
     div 快捷键 w上，s下，a左 ，d右
