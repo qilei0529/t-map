@@ -56,7 +56,7 @@ var main_config = {
                     data: {},
                     blank : true
                 },
-                type : ['door', 'event' , 'case'],
+                type : ['door', 'event' , 'case', 'trap'],
                 stack : [],
             }
 
